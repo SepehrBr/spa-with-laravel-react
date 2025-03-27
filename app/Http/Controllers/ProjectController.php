@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\TaskResource;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -15,22 +16,8 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projectsQuery = Project::query();
-
-        // pass query params if exits
-        if (request()->has('name')) {
-            $projectsQuery->where('name', 'LIKE', '%' . request('name') . '%');
-        } else if (request()->has('status')) {
-            $projectsQuery->where('status', request('status'));
-        }
-
-        // add sorting to query based on name, status, due_date, created_at and crated by
-        $sortField = request('sort_field', 'id');
-        $sortDirection = request('sort_direction', 'desc');
-        $projectsQuery->orderBy($sortField, $sortDirection);
-
         // add pagination
-        $projects = $projectsQuery->paginate(10)->onEachSide(2);
+        $projects = Project::applyQueryParams(Project::query())->paginate(10)->onEachSide(2);
 
         return Inertia::render('Projects/Index', [
                 'projects' => ProjectResource::collection($projects),
@@ -59,7 +46,14 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        $query = $project->tasks()->getQuery();
+        $tasks = Project::applyQueryParams($query)->paginate(perPage: 10)->onEachSide(1);
+        
+        return Inertia::render('Projects/Show', [
+                'project' => new ProjectResource($project),
+                'tasks' => TaskResource::collection($tasks),
+                'queryParams' => request()->query() ?: null,
+            ]);
     }
 
     /**
