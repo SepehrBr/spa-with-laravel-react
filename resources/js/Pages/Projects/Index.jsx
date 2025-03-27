@@ -17,7 +17,7 @@ export default function index({ auth, projects, queryParams = null }) {
         }
 
         // add query params to the current url
-        router.get(route('projects.index', queryParams))
+        router.get(route('projects.index'), queryParams)
     }
     const onKeyPressHandler = (name, event) => {
         if (event.key != 'Enter') return;
@@ -39,7 +39,7 @@ export default function index({ auth, projects, queryParams = null }) {
         }
 
         // add to curent url
-        router.get(route('projects.index', queryParams));
+        router.get(route('projects.index'), queryParams);
     }
 
     return (
@@ -109,7 +109,11 @@ export default function index({ auth, projects, queryParams = null }) {
                                                 <td className="px-3 py-2">
                                                     <img src={project.image_path} alt="" style={{ width: 60 }} />
                                                 </td>
-                                                <td className="px-3 py-2">{project.name}</td>
+                                                <td className="px-3 py-2">
+                                                    <Link href={route('projects.show', project.id)} className="text-white font-bold hover:underline text-nowrap">
+                                                        {project.name}
+                                                    </Link>
+                                                </td>
                                                 <td className="px-3 py-2">
                                                     <span className={"px-2 py-1 rounded text-xs text-white font-bold " + PROJECT_STATUS_CLASS_MAP[project.status]}>
                                                         {PROJECT_STATUS_TEXT_MAP[project.status]}
