@@ -21,8 +21,8 @@ class ProjectFactory extends Factory
             'name' => fake()->sentence(),
             'description' => fake()->text(),
             'due_date' => fake()->dateTimeBetween('now', '+1 year'),
-            'status' => fake()->randomElement(['نامعلوم', 'در حال انجام', 'تمام شده']),
-            'image_path' => 'https://avatar.iran.liara.run/public/',
+            'status' => fake()->randomElement(['pending', 'in_progress', 'completed']),
+            'image_path' => 'https://avatar.iran.liara.run/public/' . random_int(1, 10),
             'created_by' => 1,
             'updated_by' => 1,
         ];
