@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProjectResource extends JsonResource
 {
+    public static $wrap = false;
     /**
      * Transform the resource into an array.
      *
@@ -27,7 +28,6 @@ class ProjectResource extends JsonResource
             'updatedBy' => new UserResource($this->updatedBy),
             'created_at' => (new Carbon($this->created_at))->format('Y-m-d'),
             'updated_at' => (new Carbon($this->updated_at))->format('Y-m-d'),
-            'tasks' => TaskResource::collection($this->tasks),
         ];
     }
 }
