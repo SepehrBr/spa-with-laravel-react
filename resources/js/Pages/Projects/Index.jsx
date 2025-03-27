@@ -4,6 +4,8 @@ import TextInput from "@/Components/TextInput";
 import { PROJECT_STATUS_CLASS_MAP, PROJECT_STATUS_TEXT_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
+import { ChevronUpIcon, ChevronDownIcon, ChevronDoubleDownIcon } from "@heroicons/react/16/solid";
+import TableHeadings from "@/Components/TableHeadings";
 
 export default function index({ auth, projects, queryParams = null }) {
     queryParams = queryParams || {};
@@ -23,6 +25,23 @@ export default function index({ auth, projects, queryParams = null }) {
         searchHandler(name, event.target.value);
     }
 
+    // sorting handlers
+    const sortHandler = (field) => {
+        if (field === queryParams.sort_field) {
+            if (queryParams.sort_order === 'asc') {
+                queryParams.sort_order = 'desc';
+            } else {
+                queryParams.sort_order = 'asc';
+            }
+        } else {
+            queryParams.sort_field = field;
+            queryParams.sort_order = 'asc';
+        }
+
+        // add to curent url
+        router.get(route('projects.index', queryParams));
+    }
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -38,16 +57,17 @@ export default function index({ auth, projects, queryParams = null }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
+                            <div className="overflow-auto">
                             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b-2 border-gray-500">
                                     <tr className="text-nowrap">
-                                        <th className="px-3 py-2">ID</th>
+                                        <TableHeadings name="id" sort_field={queryParams.sort_field} sort_order={queryParams.sort_order} sortHandler={sortHandler}>ID</TableHeadings>
                                         <th className="px-3 py-2">Image</th>
-                                        <th className="px-3 py-2">Name</th>
-                                        <th className="px-3 py-2">Status</th>
-                                        <th className="px-3 py-2">Created Date</th>
-                                        <th className="px-3 py-2">Due Date</th>
-                                        <th className="px-3 py-2">Created By</th>
+                                        <TableHeadings name="name" sort_field={queryParams.sort_field} sort_order={queryParams.sort_order} sortHandler={sortHandler}>Name</TableHeadings>
+                                        <TableHeadings name="status" sort_field={queryParams.sort_field} sort_order={queryParams.sort_order} sortHandler={sortHandler}>Status</TableHeadings>
+                                        <TableHeadings name="created_at" sort_field={queryParams.sort_field} sort_order={queryParams.sort_order} sortHandler={sortHandler}>Created Date</TableHeadings>
+                                        <TableHeadings name="due_date" sort_field={queryParams.sort_field} sort_order={queryParams.sort_order} sortHandler={sortHandler}>Due Date</TableHeadings>
+                                        <TableHeadings name="created_by" sort_field={queryParams.sort_field} sort_order={queryParams.sort_order} sortHandler={sortHandler}>Created By</TableHeadings>
                                         <th className="px-3 py-2 text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -108,6 +128,7 @@ export default function index({ auth, projects, queryParams = null }) {
                                     }
                                 </tbody>
                             </table>
+                            </div>
                             <Pagination links={projects.meta.links} />
                         </div>
                     </div>

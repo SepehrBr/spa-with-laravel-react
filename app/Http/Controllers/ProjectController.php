@@ -24,6 +24,11 @@ class ProjectController extends Controller
             $projectsQuery->where('status', request('status'));
         }
 
+        // add sorting to query based on name, status, due_date, created_at and crated by
+        $sortField = request('sort_field', 'id');
+        $sortDirection = request('sort_direction', 'desc');
+        $projectsQuery->orderBy($sortField, $sortDirection);
+
         // add pagination
         $projects = $projectsQuery->paginate(10)->onEachSide(2);
 
