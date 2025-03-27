@@ -1,9 +1,27 @@
 import Pagination from "@/Components/Pagination";
+import SelectInput from "@/Components/SelectInput";
+import TextInput from "@/Components/TextInput";
 import { PROJECT_STATUS_CLASS_MAP, PROJECT_STATUS_TEXT_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 
-export default function index({ auth, projects}) {
+export default function index({ auth, projects, queryParams = null }) {
+    queryParams = queryParams || {};
+    const searchHandler = (name, value) => {
+        if (value) {
+            queryParams[name] = value;
+        } else {
+            delete queryParams[name];
+        }
+
+        // add query params to the current url
+        router.get(route('projects.index', queryParams))
+    }
+    const onKeyPressHandler = (name, event) => {
+        if (event.key != 'Enter') return;
+
+        searchHandler(name, event.target.value);
+    }
 
     return (
         <AuthenticatedLayout
@@ -31,6 +49,36 @@ export default function index({ auth, projects}) {
                                         <th className="px-3 py-2">Due Date</th>
                                         <th className="px-3 py-2">Created By</th>
                                         <th className="px-3 py-2 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b-2 border-gray-500">
+                                    <tr className="text-nowrap">
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"><TextInput
+                                                className="w-full"
+                                                defaultValue={queryParams.name}
+                                                placeholder="Search by Name"
+                                                onBlur={e => searchHandler('name', e.target.value)}
+                                                onKeyPress={e => onKeyPressHandler('name', e)}
+                                            />
+                                        </th>
+                                        <th className="px-3 py-2">
+                                            <SelectInput
+                                                className="w-full"
+                                                defaultValue={queryParams.status}
+                                                onChange={e => searchHandler('status', e.target.value)}
+                                            >
+                                                <option value="">Select Status</option>
+                                                {Object.entries(PROJECT_STATUS_TEXT_MAP).map(([key, value]) => (
+                                                    <option key={key} value={key}>{value}</option>
+                                                ))}
+                                            </SelectInput>
+                                        </th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
