@@ -1,11 +1,13 @@
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import SelectInput from "@/Components/SelectInput";
+import ShowErrorAlert from "@/Components/ShowErrorAlert";
 import TextAreaInput from "@/Components/TextAreaInput";
 import TextInput from "@/Components/TextInput";
 import { PROJECT_STATUS_TEXT_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 
 export default function Edit({ auth, project }) {
     const { data, setData, post, errors, reset } = useForm({
@@ -17,6 +19,20 @@ export default function Edit({ auth, project }) {
         due_date: project.due_date || '',
         status: project.status || '',
     });
+
+    // show error alert
+    const [showError, setShowError] = useState(!!errors.error); // convert error message into boolean
+    useEffect(() => {
+        if (errors.error) {
+            setShowError(true); // Show the error message when errors.error changes
+            const timer = setTimeout(() => {
+                setShowError(false); // Hide the error message after 5 seconds
+            }, 5000);
+
+            return () => clearTimeout(timer); // Cleanup the timer on component unmount
+        }
+    }, [errors.error]);
+    const closeErrorAlertHandler = () => setShowError(false);
 
     // submit handler
     const submitHandler = (e) => {
@@ -43,11 +59,7 @@ export default function Edit({ auth, project }) {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {errors && errors.error && (
-                        <div className="w-1/2 place-self-center text-center bg-red-500 py-2 px-4 mb-4 text-white font-bold rounded">
-                            {errors.error}
-                        </div>
-                    )}
+                { showError && <ShowErrorAlert onClickHandler={closeErrorAlertHandler} error={errors.error}/>}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         {project.image_path && (
                             <div>

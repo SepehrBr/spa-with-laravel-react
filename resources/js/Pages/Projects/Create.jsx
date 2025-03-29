@@ -1,11 +1,13 @@
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import SelectInput from "@/Components/SelectInput";
+import ShowErrorAlert from "@/Components/ShowErrorAlert";
 import TextAreaInput from "@/Components/TextAreaInput";
 import TextInput from "@/Components/TextInput";
 import { PROJECT_STATUS_TEXT_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 
 export default function Create({ auth }) {
     const { data, setData, post, errors, reset } = useForm({
@@ -15,6 +17,20 @@ export default function Create({ auth }) {
         due_date: '',
         status: '',
     });
+
+    // show error alert
+    const [showError, setShowError] = useState(!!errors.error); // convert error message into boolean
+    useEffect(() => {
+        if (errors.error) {
+            setShowError(true); // Show the error message when errors.error changes
+            const timer = setTimeout(() => {
+                setShowError(false); // Hide the error message after 5 seconds
+            }, 5000);
+
+            return () => clearTimeout(timer); // Cleanup the timer on component unmount
+        }
+    }, [errors.error]);
+    const closeErrorAlertHandler = () => setShowError(false);
 
     // submit handler
     const submitHandler = (e) => {
@@ -39,6 +55,7 @@ export default function Create({ auth }) {
             <Head title="Create New Project" />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                { showError && <ShowErrorAlert onClickHandler={closeErrorAlertHandler} error={errors.error}/>}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <form action="" className="p-4 sm:p-8 bg-white dark:bg-gray-800 flex flex-col gap-5 shadow sm:rounded-lg rounded" onSubmit={submitHandler} enctype="multipart/form-data" >
