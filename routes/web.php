@@ -18,7 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('projects', ProjectController::class);
     Route::resource('tasks', TaskController::class);
-    Route::resource('users', UserController::class);
+    Route::resource('users', UserController::class)->except(['show']);
 });
 
 Route::middleware('auth')->group(function () {

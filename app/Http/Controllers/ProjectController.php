@@ -24,10 +24,10 @@ class ProjectController extends Controller
         $projects = Project::applyQueryParams(Project::query())->paginate(10)->onEachSide(2);
 
         return Inertia::render('Projects/Index', [
-                'projects' => ProjectResource::collection($projects),
-                'queryParams' => request()->query() ?: null,
-                'success' => session('success') ?: null, // pass success message to the view if exists
-            ]);
+            'projects' => ProjectResource::collection($projects),
+            'queryParams' => request()->query() ?: null,
+            'success' => session('success') ?: null, // pass success message to the view if exists
+        ]);
     }
 
     /**

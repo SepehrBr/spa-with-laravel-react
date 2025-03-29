@@ -43,6 +43,11 @@ export default function Edit({ auth, project }) {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {errors && errors.error && (
+                        <div className="w-1/2 place-self-center text-center bg-red-500 py-2 px-4 mb-4 text-white font-bold rounded">
+                            {errors.error}
+                        </div>
+                    )}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         {project.image_path && (
                             <div>

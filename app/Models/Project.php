@@ -38,6 +38,7 @@ class Project extends Model
         // Return query
         return $query;
     }
+    
     // Relationships
     public function tasks()
     {
