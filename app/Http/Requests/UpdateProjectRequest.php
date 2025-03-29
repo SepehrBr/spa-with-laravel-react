@@ -26,7 +26,7 @@ class UpdateProjectRequest extends FormRequest
             'description' => 'nullable|string|min:3',
             'status' => 'required|in:pending,in_progress,completed',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|date|after_or_equal:today',
         ];
     }
 }

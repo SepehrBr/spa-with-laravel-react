@@ -4,7 +4,7 @@ import { Head, Link } from "@inertiajs/react";
 import TasksTable from "../Tasks/components/TasksTable";
 
 export default function Show({ auth, project, tasks, queryParams }) {
-console.log(project)
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -74,7 +74,7 @@ console.log(project)
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         {
-                            tasks.length > 0
+                            tasks.data.length > 0
                             ?
                             <TasksTable tasks={tasks} queryParams={queryParams} routeQuery={route('projects.show', project.id)}/>
                             :

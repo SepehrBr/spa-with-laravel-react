@@ -1,9 +1,7 @@
 import Pagination from "@/Components/Pagination";
-import SelectInput from "@/Components/SelectInput";
 import TextInput from "@/Components/TextInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
-import { ChevronUpIcon, ChevronDownIcon, ChevronDoubleDownIcon, XMarkIcon } from "@heroicons/react/16/solid";
 import TableHeadings from "@/Components/TableHeadings";
 import { useEffect, useState } from "react";
 import ShowSuccessAlert from "@/Components/ShowSuccessAlert";
