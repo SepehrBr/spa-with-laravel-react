@@ -1,6 +1,6 @@
 import { PROJECT_STATUS_CLASS_MAP, PROJECT_STATUS_TEXT_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import TasksTable from "../Tasks/components/TasksTable";
 
 export default function Show({ auth, project, tasks, queryParams }) {
@@ -73,7 +73,16 @@ console.log(project)
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                        <TasksTable tasks={tasks} queryParams={queryParams} routeQuery={route('projects.show', project.id)}/>
+                        {
+                            tasks.length > 0
+                            ?
+                            <TasksTable tasks={tasks} queryParams={queryParams} routeQuery={route('projects.show', project.id)}/>
+                            :
+                            <div className="p-6 text-gray-900 dark:text-gray-100 flex items-center justify-center gap-4">
+                                <p className="text-center">No tasks found for this project.</p>
+                                <Link href={route('tasks.create')} className="text-blue-500 hover:underline">Create One?</Link>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

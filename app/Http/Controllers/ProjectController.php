@@ -7,6 +7,7 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TaskResource;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -121,6 +122,47 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+       try {
+            $project->delete();
+
+            // Return a JSON response for API requests
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Project deleted successfully.',
+                ], 200);
+            }
+
+            // Redirect to the projects index page with a success message
+            return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
+       } catch (\Illuminate\Database\QueryException $e) {
+            // Handle foreign key constraint violation
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete project. It may have related tasks or dependencies.',
+                    'error' => $e->getMessage(),
+                ], 422); // 422 Unprocessable Entity
+            }
+
+            // Redirect back with an error message
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Failed to delete project. It may have related tasks or dependencies.']);
+       } catch (Exception $e) {
+            // Handle any other exceptions
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete project. Please try again.',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+
+            // Redirect back with a generic error message
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Failed to delete project. Please try again.']);
+       }
     }
 }

@@ -42,6 +42,18 @@ export default function index({ auth, projects, queryParams = null, success = nu
         router.get(route('projects.index'), queryParams);
     }
 
+    // delete project
+    const deleteProjectHandler = (project) => {
+        if (!confirm('Are you sure you want to delete this project?')) {
+            return;
+        }
+
+        // send delete request
+        router.delete(route('projects.destroy', project.id), {
+            preserveScroll: true, // Preserve scroll position after deletion
+        });
+    }
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -61,7 +73,7 @@ export default function index({ auth, projects, queryParams = null, success = nu
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {success && (<div className="w-1/2 place-self-center bg-emerald-500 py-2 px-4 mb-4 text-white rounded">{success}</div>)}
+                    {success && (<div className="w-1/2 place-self-center text-center bg-emerald-500 py-2 px-4 mb-4 text-white rounded">{success}</div>)}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <div className="overflow-auto">
@@ -132,7 +144,7 @@ export default function index({ auth, projects, queryParams = null, success = nu
                                                 <td className="px-3 py-2">
                                                     <Link href={route('projects.edit', project.id)} className="text-blue-500 hover:text-blue-700 mx-2">Edit</Link>
                                                     <Link href={route('projects.show', project.id)} className="text-yellow-500 hover:text-yellow-700 mx-2">View</Link>
-                                                    <Link href={route('projects.destroy', project.id)} className="text-red-500 hover:text-red-700 mx-2">Delete</Link>
+                                                    <button type="button" onClick={e => deleteProjectHandler(project)} className="text-red-500 hover:text-red-700 mx-2">Delete</button>
                                                 </td>
                                             </tr>
                                         ))
