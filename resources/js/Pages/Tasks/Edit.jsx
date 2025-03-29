@@ -1,18 +1,27 @@
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
+import RadioInput from "@/Components/RadioInput";
+import SelectInput from "@/Components/SelectInput";
 import ShowErrorAlert from "@/Components/ShowErrorAlert";
+import TextAreaInput from "@/Components/TextAreaInput";
 import TextInput from "@/Components/TextInput";
+import { TASK_PRIORITY_TEXT_MAP, TASK_STATUS_TEXT_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
-export default function Edit({ auth, task }) {
+export default function Edit({ auth, task, projects, users }) {
     const { data, setData, post, errors, reset } = useForm({
         _method: 'PUT',
         name: task.name || '',
-        email: task.email || '',
-        password: '',
-        password_confirmation: '',
+        description: task.description || '',
+        status: task.status || '',
+        priority: task.priority || '',
+        image: null,
+        image_path: task.image_path || null,
+        due_date: task.due_date || '',
+        project: task.project || '',
+        assigned_to: task.assignedTo || '',
     });
 
     // show error alert
@@ -28,7 +37,7 @@ export default function Edit({ auth, task }) {
         }
     }, [errors.error]);
     const closeErrorAlertHandler = () => setShowError(false);
-    
+
     // submit handler
     const submitHandler = (e) => {
         e.preventDefault();
@@ -36,7 +45,7 @@ export default function Edit({ auth, task }) {
             data,
             onSuccess: () => reset(), // reset the form on success
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'multipart/form-data', // Set the content type to multipart/form-data for file upload
             }
         });
     }
@@ -56,27 +65,76 @@ export default function Edit({ auth, task }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     { showError && <ShowErrorAlert onClickHandler={closeErrorAlertHandler} error={errors.error}/>}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                        {task.image_path && (
+                            <div>
+                                <img src={task.image_path} alt="" className="w-full h-64 object-cover"/>
+                            </div>
+                        )}
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <form action="" className="p-4 sm:p-8 bg-white dark:bg-gray-800 flex flex-col gap-5 shadow sm:rounded-lg rounded" onSubmit={submitHandler} >
+                            <form action="" className="p-4 sm:p-8 bg-white dark:bg-gray-800 flex flex-col gap-5 shadow sm:rounded-lg rounded" onSubmit={submitHandler} enctype="multipart/form-data" >
+                                <div>
+                                    <InputLabel htmlFor="image" value="Task Image" className="mb-2" />
+                                    <TextInput id="image" type="file" name="image" className="block w-full" onChange={e => setData('image', e.target.files[0])} />
+                                    <InputError message={errors.image} className="mt-2" />
+                                </div>
                                 <div>
                                     <InputLabel htmlFor="name" value="Task Name" className="mb-2" />
                                     <TextInput id="name" type="text" name="name" value={data.name} className="block w-full" onChange={e => setData('name', e.target.value)} isFocused={true} placeholder="Add Task's Name" />
                                     <InputError message={errors.name} className="mt-2" />
                                 </div>
                                 <div>
-                                    <InputLabel htmlFor="email" value="Task Email" className="mb-2" />
-                                    <TextInput id="email" type="text" name="email" value={data.email} className="block w-full" onChange={e => setData('email', e.target.value)}  placeholder="Add Task's Email" />
-                                    <InputError message={errors.email} className="mt-2" />
+                                    <TextAreaInput id="description" name="description" value={data.description} placeholder="Add Task's Desctiprtion" className="w-full block" onChange={e => setData('description', e.target.value)} />
+                                    <InputError message={errors.description} className="mt-2" />
                                 </div>
                                 <div>
-                                    <InputLabel htmlFor="password" value="Password" className="mb-2" />
-                                    <TextInput id="password" type="password" name="password" value={data.password} className="block w-full" onChange={e => setData('password', e.target.value)}  placeholder="********" />
-                                    <InputError message={errors.password} className="mt-2" />
+                                    <InputLabel htmlFor="status" value="Task Status" className="mb-2" />
+                                    <SelectInput id="status" name="status" value={data.status} className="block w-full" onChange={e => setData('status', e.target.value)}
+                                    >
+                                        <option value="">Select Status</option>
+                                        {Object.entries(TASK_STATUS_TEXT_MAP).map(([key, value]) => (
+                                            <option key={key} value={key}>{value}</option>
+                                        ))}
+                                    </SelectInput>
                                 </div>
                                 <div>
-                                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" className="mb-2" />
-                                    <TextInput id="password_confirmation" type="password" name="password_confirmation" value={data.password_confirmation} className="block w-full" onChange={e => setData('password_confirmation', e.target.value)}  placeholder="********" />
-                                    <InputError message={errors.password_confirmation} className="mt-2" />
+                                    <InputLabel value="Priority" className="mb-2" />
+                                    <div className="flex justify-start items-center gap-3">
+                                        {Object.entries(TASK_PRIORITY_TEXT_MAP).map(([key, value]) => (
+                                            <RadioInput checked={key == data.priority} key={key} name="priority" htmlFor={key} label={value} onChange={(e) => setData('priority', e.target.value)} value={key}/>
+                                        ))}
+                                    </div>
+                                    <InputError message={errors.priority} className="mt-2" />
+                                </div>
+                                <div>
+                                    <InputLabel htmlFor="due_date" value="Project Deadline" className="mb-2" />
+                                    <TextInput id="due_date" type="date" name="due_date" value={data.due_date} className="block w-full" onChange={e => setData('due_date', e.target.value)} />
+                                    <InputError message={errors.due_date} className="mt-2" />
+                                </div>
+                                <div>
+                                    <InputLabel htmlFor="project" value="Related Project" className="mb-2" />
+                                    <SelectInput id="project" name="project" value={data.project.id} className="block w-full" onChange={e => setData('project', e.target.value)}
+                                    >
+                                        <option value="">Select Project</option>
+                                        { projects.map(project => (
+                                                    <option key={project.id} value={project.id}>{project.name}</option>
+                                                )
+                                            )
+                                        }
+                                    </SelectInput>
+                                    <InputError message={errors.project} className="mt-2" />
+                                </div>
+                                <div>
+                                    <InputLabel htmlFor="user" value="Assign To" className="mb-2" />
+                                    <SelectInput id="user" name="assigned_to" value={data.assigned_to.id} className="block w-full" onChange={e => setData('assigned_to', e.target.value)}
+                                    >
+                                        <option value="">Select User</option>
+                                        { users.map(user => (
+                                                    <option key={user.id} value={user.id}>{user.name}</option>
+                                                )
+                                            )
+                                        }
+                                    </SelectInput>
+                                    <InputError message={errors.assigned_to} className="mt-2" />
                                 </div>
                                 <div className="mt-5 text-right">
                                     <Link href={route('tasks.index')} className="bg-gray-100 py-2 px-4 text-gray-800 rounded shadow transition-all hover:bg-gray-200 mr-3">Cancel</Link>
