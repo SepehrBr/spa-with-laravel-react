@@ -9,6 +9,7 @@ use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TaskResource;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -69,7 +70,7 @@ class ProjectController extends Controller
 
             // Redirect to the projects index page with a success message
             return redirect()->route('projects.index')->with('success', 'Project created successfully.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Return a JSON response for API requests
             if ($request->expectsJson()) {
                 return response()->json([
@@ -95,10 +96,10 @@ class ProjectController extends Controller
         $tasks = Project::applyQueryParams($query)->paginate(perPage: 10)->onEachSide(1);
 
         return Inertia::render('Projects/Show', [
-                'project' => new ProjectResource($project),
-                'tasks' => TaskResource::collection($tasks),
-                'queryParams' => request()->query() ?: null,
-            ]);
+            'project' => new ProjectResource($project),
+            'tasks' => TaskResource::collection($tasks),
+            'queryParams' => request()->query() ?: null,
+        ]);
     }
 
     /**
@@ -106,7 +107,9 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        return Inertia::render('Projects/Edit', [
+            'project' => new ProjectResource($project),
+        ]);
     }
 
     /**
@@ -114,7 +117,50 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $data = $request->validated();
+
+        // update created_by and updated_by fields
+        $data['updated_by'] = Auth::id();
+
+        // store image and update path of it
+        $image = $request->file('image');
+        if ($image) {
+            // check if image exists, delete previous one
+            if ($project->image_path) {
+                Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+            }
+
+            // update new added image path
+            $data['image_path'] = $image->store('projects/images/' . Str::random(10), 'public'); // Store the image in the public disk
+        }
+
+        try {
+            $project->update($data);
+
+            // Return a JSON response for API requests
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Project updated successfully.',
+                    'data' => new ProjectResource($project),
+                ], 200);
+            }
+
+            // Redirect to the projects index page with a success message
+            return redirect()->route('projects.index')->with('success', "Project \"$project->name\" updated successfully.");
+        } catch (Exception $e) {
+            // return a JSON response for API request
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update project. Please try again later.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            // return back with error message
+            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update project. Please try again later.']);
+        }
     }
 
     /**
@@ -124,6 +170,11 @@ class ProjectController extends Controller
     {
        try {
             $project->delete();
+
+            // delete image and its path from public disk
+            if ($project->image_path) {
+                Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+            }
 
             // Return a JSON response for API requests
             if (request()->expectsJson()) {
