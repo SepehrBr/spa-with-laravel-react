@@ -11,6 +11,7 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
 export default function Edit({ auth, task, projects, users }) {
+    console.log(projects)
     const { data, setData, post, errors, reset } = useForm({
         _method: 'PUT',
         name: task.name || '',
@@ -115,7 +116,7 @@ export default function Edit({ auth, task, projects, users }) {
                                     <SelectInput id="project" name="project" value={data.project.id} className="block w-full" onChange={e => setData('project', e.target.value)}
                                     >
                                         <option value="">Select Project</option>
-                                        { projects.map(project => (
+                                        { projects.data.map(project => (
                                                     <option key={project.id} value={project.id}>{project.name}</option>
                                                 )
                                             )
@@ -128,7 +129,7 @@ export default function Edit({ auth, task, projects, users }) {
                                     <SelectInput id="user" name="assigned_to" value={data.assigned_to.id} className="block w-full" onChange={e => setData('assigned_to', e.target.value)}
                                     >
                                         <option value="">Select User</option>
-                                        { users.map(user => (
+                                        { users.data.map(user => (
                                                     <option key={user.id} value={user.id}>{user.name}</option>
                                                 )
                                             )

@@ -108,7 +108,7 @@ export default function Create({ auth, projects, users  }) {
                                     <SelectInput id="project" name="project" value={data.project} className="block w-full" onChange={e => setData('project', e.target.value)}
                                     >
                                         <option value="">Select Project</option>
-                                        { projects.map(project => (
+                                        { projects.data.map(project => (
                                                     <option key={project.id} value={project.id}>{project.name}</option>
                                                 )
                                             )
@@ -121,7 +121,7 @@ export default function Create({ auth, projects, users  }) {
                                     <SelectInput id="user" name="assigned_to" value={data.assigned_to} className="block w-full" onChange={e => setData('assigned_to', e.target.value)}
                                     >
                                         <option value="">Select User</option>
-                                        { users.map(user => (
+                                        { users.data.map(user => (
                                                     <option key={user.id} value={user.id}>{user.name}</option>
                                                 )
                                             )

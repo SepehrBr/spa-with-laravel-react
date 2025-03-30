@@ -98,8 +98,12 @@ export default function TasksTable({ tasks, queryParams = null, routeQuery }) {
                                     <td className="px-3 py-2">
                                         <img src={task.image_path} alt="" style={{ width: 60 }} />
                                     </td>
-                                    <td className="px-3 py-2">{task.project.name}</td>
-                                    <td className="px-3 py-2">{task.name}</td>
+                                    <td className="px-3 py-2">
+                                        <Link href={route('projects.show', task.project.id)} className="text-white font-bold hover:underline text-nowrap">{task.project.name}</Link>
+                                    </td>
+                                    <td className="px-3 py-2">
+                                        <Link href={route('tasks.show', task.id)} className="text-white font-bold hover:underline">{task.name}</Link>
+                                    </td>
                                     <td className="px-3 py-2">
                                         <span className={"px-2 py-1 rounded text-xs text-white font-bold " + TASK_STATUS_CLASS_MAP[task.status]}>
                                             {TASK_STATUS_TEXT_MAP[task.status]}

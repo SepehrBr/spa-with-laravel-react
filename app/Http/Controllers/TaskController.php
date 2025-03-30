@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TaskResource;
+use App\Http\Resources\UserResource;
 use App\Models\Project;
 use App\Models\User;
 use Exception;
@@ -41,8 +43,8 @@ class TaskController extends Controller
         $users = User::all();
 
         return Inertia::render('Tasks/Create', [
-            'projects' => $projects,
-            'users' => $users,
+            'projects' => ProjectResource::collection($projects),
+            'users' => UserResource::collection($users),
         ]);
     }
 
@@ -119,8 +121,8 @@ class TaskController extends Controller
         $users = User::all();
 
         return Inertia::render('Tasks/Edit', [
-            'projects' => $projects,
-            'users' => $users,
+            'projects' => ProjectResource::collection($projects),
+            'users' => UserResource::collection($users),
             'task' => new TaskResource($task),
         ]);
     }
@@ -233,5 +235,22 @@ class TaskController extends Controller
                 ->back()
                 ->withErrors(['error' => 'Failed to delete task. Please try again.']);
        }
+    }
+
+    /**
+     * Display a listing of tasks created by the authenticated user.
+     */
+    public function myTasks()
+    {
+        $tasks = Task::where('created_by', Auth::id())
+            // ->applyQueryParams(Task::query())
+            // ->paginate(perPage: 10)
+            // ->onEachSide(1);
+            ->paginate(10)->onEachSide(1);
+        return Inertia::render('Tasks/MyTasks', [
+            'tasks' => TaskResource::collection($tasks),
+            'queryParams' => request()->query() ?: null,
+            'success' => session('success') ?: null,
+        ]);
     }
 }
