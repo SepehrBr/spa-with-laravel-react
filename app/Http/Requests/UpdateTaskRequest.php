@@ -28,8 +28,8 @@ class UpdateTaskRequest extends FormRequest
             'priority' => 'required|string|in:low,medium,high',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'due_date' => 'nullable|date|after_or_equal:today',
-            'project' => 'required|integer|exists:projects,id',
-            'assigned_to' => 'required|integer|exists:users,id',
+            'project' => 'required|exists:projects,id',
+            'assigned_to' => 'required|exists:users,id',
         ];
     }
 }
